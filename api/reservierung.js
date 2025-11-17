@@ -1,4 +1,4 @@
-mport nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -31,9 +31,9 @@ export default async function handler(req, res) {
 
   // Mail an DICH (Café)
   await transporter.sendMail({
-    from: "Café Website" <${process.env.MAIL_USER}>,
+    from: `"Café Website" <${process.env.MAIL_USER}>`,
     to: process.env.MAIL_USER,
-    subject: Neue Tischreservierung von ${name},
+    subject: `Neue Tischreservierung von ${name}`,
     text: `
 Neue Reservierungsanfrage über die Website:
 
@@ -52,7 +52,7 @@ ${nachricht || "-"}
 
   // Mail an den KUNDEN
   await transporter.sendMail({
-    from: "Café Example Zittau" <${process.env.MAIL_USER}>,
+    from: `"Café Example Zittau" <${process.env.MAIL_USER}>`,
     to: email,
     subject: "Wir haben deine Reservierung erhalten",
     text: `
@@ -67,5 +67,5 @@ Café Example Zittau
 `
   });
 
-  return res.status(200).json({ message: "OK" });
+  return res.status(200).json({ message: "OK" });
 }
