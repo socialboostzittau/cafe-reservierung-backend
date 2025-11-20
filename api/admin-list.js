@@ -12,14 +12,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const ids = await kv.lrange("res:list", 0, -1); // neueste zuerst
+    const ids = await kv.lrange("res:list", 0, -1);
     const reservations = [];
 
     for (const id of ids) {
-      const data = await kv.hgetall(`res:${id}`);   // ← FIXED
-      if (data && data.id) {
-        reservations.push(data);
-      }
+      const data = await kv.hgetall(`res:${id}`);
+      if (data && data.id) reservations.push(data);
     }
 
     return res.status(200).json({ reservations });
