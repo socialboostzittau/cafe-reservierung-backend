@@ -19,16 +19,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const reservation = await kv.hgetall(res:${id});
+    const reservation = await kv.hgetall(`res:${id}`);
 
     if (!reservation || !reservation.email) {
       return res.status(404).json({ message: "Reservierung nicht gefunden." });
     }
 
-    // Status in KV aktualisieren
-    await kv.hset(res:${id}, { ...reservation, status });
+    // Status updaten
+    await kv.hset(`res:${id}`, { ...reservation, status });
 
-    // Mail vorbereiten
+    // Mailer vorbereiten
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -55,7 +55,7 @@ Wir freuen uns auf deinen Besuch!
 
 Herzliche Grüße
 Café Example Zittau
-      `;
+`;
     } else if (status === "abgelehnt") {
       subject = "Deine Reservierung im Café Example Zittau";
       text = `
@@ -66,12 +66,12 @@ vielen Dank für deine Reservierungsanfrage im Café Example Zittau.
 Leider können wir deine Reservierung zum gewünschten Zeitpunkt
 (${reservation.datum}, ${reservation.uhrzeit} für ${reservation.personen} Person/en) nicht annehmen.
 
-Gern kannst du einen alternativen Termin anfragen
+Gerne kannst du einen alternativen Termin anfragen
 oder uns direkt telefonisch kontaktieren.
 
 Herzliche Grüße
 Café Example Zittau
-      `;
+`;
     } else {
       return res.status(400).json({ message: "Ungültiger Status." });
     }
@@ -86,8 +86,6 @@ Café Example Zittau
     return res.status(200).json({ message: "Status aktualisiert und E-Mail gesendet." });
   } catch (err) {
     console.error("ADMIN UPDATE ERROR", err);
-    return res
-      .status(500)
-      .json({ message: "Fehler beim Aktualisieren der Reservierung." });
-  }
+    return res.status(500).json({ message: "Fehler beim Aktualisieren der Reservierung." });
+  }
 }
