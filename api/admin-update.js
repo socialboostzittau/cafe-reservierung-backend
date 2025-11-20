@@ -21,14 +21,12 @@ export default async function handler(req, res) {
   try {
     const reservation = await kv.hgetall(`res:${id}`);
 
-    if (!reservation || !reservation.email) {
+    if (!reservation) {
       return res.status(404).json({ message: "Reservierung nicht gefunden." });
     }
 
-    // Status updaten
     await kv.hset(`res:${id}`, { ...reservation, status });
 
-    // Mailer vorbereiten
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -37,55 +35,50 @@ export default async function handler(req, res) {
       },
     });
 
-    let subject;
-    let text;
+    let subject = "";
+    let text = "";
 
     if (status === "bestaetigt") {
-      subject = "Deine Reservierung im Café Example Zittau – bestätigt";
+      subject = "Deine Reservierung – bestätigt";
       text = `
 Hallo ${reservation.name},
 
-deine Reservierung im Café Example Zittau ist bestätigt.
+deine Reservierung im Café Example Zittau wurde bestätigt:
 
 Datum: ${reservation.datum}
 Uhrzeit: ${reservation.uhrzeit}
 Personen: ${reservation.personen}
 
-Wir freuen uns auf deinen Besuch!
-
-Herzliche Grüße
-Café Example Zittau
-`;
+Wir freuen uns auf dich!
+      `;
     } else if (status === "abgelehnt") {
-      subject = "Deine Reservierung im Café Example Zittau";
+      subject = "Deine Reservierung – leider nicht möglich";
       text = `
 Hallo ${reservation.name},
 
-vielen Dank für deine Reservierungsanfrage im Café Example Zittau.
+leider können wir deine Reservierung am
+${reservation.datum} um ${reservation.uhrzeit}
+für ${reservation.personen} Person/en nicht annehmen.
 
-Leider können wir deine Reservierung zum gewünschten Zeitpunkt
-(${reservation.datum}, ${reservation.uhrzeit} für ${reservation.personen} Person/en) nicht annehmen.
-
-Gerne kannst du einen alternativen Termin anfragen
-oder uns direkt telefonisch kontaktieren.
+Wir schlagen dir gern einen neuen Termin vor!
 
 Herzliche Grüße
 Café Example Zittau
-`;
+      `;
     } else {
       return res.status(400).json({ message: "Ungültiger Status." });
     }
 
     await transporter.sendMail({
-      from: process.env.MAIL_USER,
+      from: `Café Example Zittau <${process.env.MAIL_USER}>`,
       to: reservation.email,
       subject,
       text,
     });
 
-    return res.status(200).json({ message: "Status aktualisiert und E-Mail gesendet." });
+    return res.status(200).json({ message: "Status aktualisiert & E-Mail gesendet." });
   } catch (err) {
     console.error("ADMIN UPDATE ERROR", err);
-    return res.status(500).json({ message: "Fehler beim Aktualisieren der Reservierung." });
+    return res.status(500).json({ message: "Fehler beim Aktualisieren." });
   }
 }
