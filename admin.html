@@ -1,283 +1,569 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Café Example – Reservierungs-Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Reservierungs-Admin – Café Example Zittau</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    :root {
+      --brown-dark: #3f291c;
+      --brown: #5b3a23;
+      --brown-light: #8a6240;
+      --beige: #f3e0c8;
+      --cream: #fff8ee;
+      --accent: #c69a6b;
+      --danger: #c0392b;
+      --success: #2ecc71;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f6f3ee;
+      background: radial-gradient(circle at top left, #f7ead6, #f1dec7);
+      min-height: 100vh;
       color: #2b211a;
-      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 1.5rem;
     }
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-    .login, .app {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+
     .card {
-      background: #fff;
-      border-radius: 1rem;
-      padding: 1.2rem 1.4rem;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-      margin-top: 1rem;
-    }
-    input[type="password"], input[type="text"] {
-      padding: 0.5rem 0.6rem;
-      border-radius: 0.5rem;
-      border: 1px solid rgba(0,0,0,0.15);
       width: 100%;
-      max-width: 260px;
-      font: inherit;
+      max-width: 980px;
+      background: #fffdf8;
+      border-radius: 1.5rem;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.15);
+      padding: 1.8rem 1.8rem 2rem;
+      border: 1px solid rgba(0,0,0,0.05);
     }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+      color: var(--brown-dark);
+    }
+
+    p.sub {
+      font-size: 0.9rem;
+      color: var(--brown-light);
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brown-light);
+      margin-bottom: 0.25rem;
+      display: inline-block;
+    }
+
+    input[type="password"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 0.6rem 0.7rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(0,0,0,0.18);
+      outline: none;
+      font: inherit;
+      background: #fffbf5;
+      transition: border 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(198,154,107,0.35);
+    }
+
     button {
-      padding: 0.45rem 0.9rem;
-      border-radius: 0.6rem;
       border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
-      font: inherit;
-      margin-left: 0.5rem;
-    }
-    button.primary {
-      background: #3f291c;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--brown-dark);
       color: #fff;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
     }
+
+    button:hover {
+      background: #2a1c12;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.18);
+    }
+
     button.secondary {
-      background: #e2ded6;
-      color: #2b211a;
+      background: transparent;
+      color: var(--brown-dark);
+      border: 1px solid rgba(0,0,0,0.16);
+      box-shadow: none;
     }
+
+    button.secondary:hover {
+      background: rgba(0,0,0,0.03);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+    }
+
+    .status-bar {
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 0.7rem;
+      background: #f5eee3;
+      color: var(--brown-dark);
+      display: none;
+    }
+
+    .status-bar.ok {
+      background: #e5f7eb;
+      color: #21653e;
+    }
+
+    .status-bar.err {
+      background: #fdecea;
+      color: #b02a1e;
+    }
+
+    .login-only {
+      max-width: 420px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+      align-items: flex-end;
+    }
+
+    .row > div {
+      flex: 1 1 160px;
+    }
+
+    .top-row {
+      justify-content: space-between;
+      gap: 1.2rem;
+    }
+
+    .top-row .title-block {
+      flex: 1 1 auto;
+    }
+
+    .top-row .controls-block {
+      flex: 0 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.1rem 0.6rem;
+      border-radius: 999px;
+      background: var(--brown-dark);
+      color: #fff;
+      font-size: 0.75rem;
+      margin-left: 0.3rem;
+    }
+
+    .table-wrap {
+      margin-top: 1.3rem;
+      border-radius: 1rem;
+      overflow: auto;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: #fffdf9;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.8rem;
-      font-size: 0.9rem;
+      font-size: 0.86rem;
     }
+
+    thead {
+      background: #f3e4cf;
+    }
+
     th, td {
-      border-bottom: 1px solid #eee;
-      padding: 0.4rem 0.3rem;
+      padding: 0.55rem 0.7rem;
       text-align: left;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      vertical-align: middle;
     }
+
     th {
       font-weight: 600;
-      font-size: 0.85rem;
+      white-space: nowrap;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      color: var(--brown-dark);
     }
-    .status-badge {
-      padding: 0.15rem 0.5rem;
+
+    tr:nth-child(even) td {
+      background: #fffbf5;
+    }
+
+    .pill-status {
+      padding: 0.1rem 0.6rem;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
     }
-    .neu { background: #fff3cd; color: #856404; }
-    .bestaetigt { background: #d4edda; color: #155724; }
-    .abgelehnt { background: #f8d7da; color: #721c24; }
-    .toolbar {
+
+    .pill-neu {
+      background: #fff4d6;
+      color: #8a5b05;
+    }
+    .pill-bestaetigt {
+      background: #e6f7eb;
+      color: #256b3c;
+    }
+    .pill-abgelehnt {
+      background: #fde1de;
+      color: #a0291c;
+    }
+
+    .actions-cell {
+      white-space: nowrap;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.6rem;
+      gap: 0.35rem;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 0.5rem;
     }
-    .toolbar input[type="text"] {
-      max-width: 220px;
-    }
+
     .small {
-      font-size: 0.8rem;
-      color: #7a6c5d;
+      font-size: 0.78rem;
+      color: var(--brown-light);
+    }
+
+    @media (max-width: 720px) {
+      .card {
+        padding: 1.4rem 1.25rem 1.5rem;
+      }
+      .top-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="login" id="loginView">
+  <!-- LOGIN VIEW -->
+  <div class="card login-only" id="loginView">
     <h1>Reservierungs-Admin</h1>
-    <p class="small">Gib dein Admin-Passwort ein, um alle Reservierungen zu verwalten.</p>
-    <div class="card">
-      <label for="adminPass">Admin-Passwort</label><br>
-      <input type="password" id="adminPass" />
-      <button class="primary" id="loginBtn">Login</button>
-      <p id="loginError" class="small" style="color:#b00020;margin-top:0.4rem;"></p>
-    </div>
+    <p class="sub">
+      Gib dein Admin-Passwort ein, um alle Reservierungen zu verwalten.
+    </p>
+
+    <form id="loginForm">
+      <label for="adminPassword">Admin-Passwort</label>
+      <input type="password" id="adminPassword" autocomplete="current-password" required>
+      <button type="submit" style="margin-top:0.9rem;">Login</button>
+      <div id="loginError" class="error"></div>
+    </form>
   </div>
 
-  <div class="app" id="appView" style="display:none;">
-    <h1>Café Example – Reservierungen</h1>
-    <div class="card">
-      <div class="toolbar">
-        <div>
-          <strong>Reservierungen</strong><br>
-          <span class="small" id="resCount"></span>
-        </div>
-        <div>
-          <input type="text" id="search" placeholder="Suche nach Name / Datum..." />
-          <button class="secondary" id="refreshBtn">Neu laden</button>
-        </div>
+  <!-- APP VIEW -->
+  <div class="card" id="appView" style="display:none;">
+    <div class="top-row">
+      <div class="title-block">
+        <h1>Reservierungen verwalten</h1>
+        <p class="sub">
+          Eingegangene Reservierungen einsehen, filtern und den Status setzen.
+        </p>
       </div>
+      <div class="controls-block">
+        <button class="secondary" id="btnRefresh">Aktualisieren</button>
+        <button class="secondary" id="btnLogout">Logout</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="searchInput">Suche (Name, E-Mail, Datum)</label>
+        <input type="text" id="searchInput" placeholder="z.B. Müller oder 2025-11-20">
+      </div>
+      <div style="max-width:190px;">
+        <label for="filterStatus">Status</label>
+        <select id="filterStatus">
+          <option value="all">Alle</option>
+          <option value="neu">Nur neue</option>
+          <option value="bestaetigt">Bestätigt</option>
+          <option value="abgelehnt">Abgelehnt</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>ID</th>
             <th>Gast</th>
-            <th>Datum</th>
-            <th>Uhrzeit</th>
-            <th>Pers.</th>
+            <th>Kontakt</th>
+            <th>Termin</th>
             <th>Status</th>
             <th>Aktion</th>
           </tr>
         </thead>
-        <tbody id="tableBody">
-          <!-- Einträge werden per JS eingefügt -->
+        <tbody id="resTableBody">
+          <!-- wird per JS gefüllt -->
         </tbody>
       </table>
-      <p class="small" id="statusMsg"></p>
     </div>
+
+    <div id="statusBar" class="status-bar"></div>
   </div>
 
-<script>
-const API_BASE = ""; // gleiches Projekt, daher leer
-let adminKey = null;
-let allReservations = [];
+  <script>
+    const API_BASE = "https://cafe-reservierung-backend.vercel.app/api";
 
-function statusBadge(status) {
-  const s = (status || "neu").toLowerCase();
-  const cls = s === "bestaetigt" ? "bestaetigt" : s === "abgelehnt" ? "abgelehnt" : "neu";
-  return '<span class="status-badge ' + cls + '">' + s + "</span>";
-}
+    let adminKey = "";
+    let reservations = [];
 
-function renderTable(filter = "") {
-  const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = "";
+    const loginView   = document.getElementById("loginView");
+    const appView     = document.getElementById("appView");
+    const loginForm   = document.getElementById("loginForm");
+    const loginError  = document.getElementById("loginError");
+    const searchInput = document.getElementById("searchInput");
+    const filterStatus = document.getElementById("filterStatus");
+    const resTableBody = document.getElementById("resTableBody");
+    const statusBar   = document.getElementById("statusBar");
+    const btnRefresh  = document.getElementById("btnRefresh");
+    const btnLogout   = document.getElementById("btnLogout");
 
-  const term = filter.trim().toLowerCase();
-  let list = allReservations;
+    function showStatus(message, ok = true) {
+      statusBar.textContent = message;
+      statusBar.style.display = "block";
+      statusBar.classList.toggle("ok", ok);
+      statusBar.classList.toggle("err", !ok);
 
-  if (term) {
-    list = list.filter(r =>
-      (r.name || "").toLowerCase().includes(term) ||
-      (r.datum || "").toLowerCase().includes(term) ||
-      (r.status || "").toLowerCase().includes(term)
-    );
-  }
-
-  document.getElementById("resCount").textContent =
-    list.length + " Einträge (gesamt: " + allReservations.length + ")";
-
-  if (list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="small">Keine Reservierungen gefunden.</td></tr>';
-    return;
-  }
-
-  for (const r of list) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.id || ""}</td>
-      <td>${r.name || ""}<br><span class="small">${r.email || ""}</span></td>
-      <td>${r.datum || ""}</td>
-      <td>${r.uhrzeit || ""}</td>
-      <td>${r.personen || ""}</td>
-      <td>${statusBadge(r.status)}</td>
-      <td>
-        <button class="primary" data-id="${r.id}" data-status="bestaetigt">Bestätigen</button>
-        <button class="secondary" data-id="${r.id}" data-status="abgelehnt">Ablehnen</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-}
-
-async function loadReservations() {
-  if (!adminKey) return;
-  document.getElementById("statusMsg").textContent = "Lade Reservierungen...";
-  try {
-    const res = await fetch(API_BASE + "/api/admin-list", {
-      headers: { "x-admin-key": adminKey }
-    });
-    if (!res.ok) {
-      throw new Error("Fehler: " + res.status);
+      if (ok) {
+        setTimeout(() => {
+          statusBar.style.display = "none";
+        }, 4000);
+      }
     }
-    const data = await res.json();
-    allReservations = data.reservations || [];
-    renderTable(document.getElementById("search").value);
-    document.getElementById("statusMsg").textContent = "";
-  } catch (err) {
-    console.error(err);
-    document.getElementById("statusMsg").textContent =
-      "Fehler beim Laden der Reservierungen.";
-  }
-}
 
-async function updateStatus(id, status) {
-  if (!adminKey) return;
-  document.getElementById("statusMsg").textContent = "Aktualisiere Reservierung...";
-  try {
-    const res = await fetch(API_BASE + "/api/admin-update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-key": adminKey
-      },
-      body: JSON.stringify({ id, status })
-    });
-    if (!res.ok) {
-      throw new Error("Fehler: " + res.status);
+    async function fetchReservations() {
+      try {
+        const res = await fetch(`${API_BASE}/admin-list`, {
+          headers: {
+            "x-admin-key": adminKey
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error("Fehler beim Laden");
+        }
+
+        const data = await res.json();
+        reservations = data.reservations || [];
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        showStatus("Fehler beim Laden der Reservierungen.", false);
+      }
     }
-    const data = await res.json();
-    document.getElementById("statusMsg").textContent = data.message || "Aktualisiert.";
-    await loadReservations();
-  } catch (err) {
-    console.error(err);
-    document.getElementById("statusMsg").textContent =
-      "Fehler beim Aktualisieren / Mailversand.";
-  }
-}
 
-// Login-Handling
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const pw = document.getElementById("adminPass").value.trim();
-  if (!pw) return;
-  adminKey = pw;
-  // kleiner Test-Call
-  fetch("/api/admin-list", {
-    headers: { "x-admin-key": adminKey }
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error("Unauthorized");
-      document.getElementById("loginView").style.display = "none";
-      document.getElementById("appView").style.display = "block";
-      document.getElementById("loginError").textContent = "";
-      loadReservations();
-    })
-    .catch(() => {
-      adminKey = null;
-      document.getElementById("loginError").textContent =
-        "Falsches Passwort oder Serverfehler.";
+    function renderTable() {
+      const search = searchInput.value.trim().toLowerCase();
+      const statusFilter = filterStatus.value;
+
+      let filtered = reservations.slice();
+
+      if (statusFilter !== "all") {
+        filtered = filtered.filter(r => (r.status || "neu") === statusFilter);
+      }
+
+      if (search) {
+        filtered = filtered.filter(r => {
+          const haystack = [
+            r.name || "",
+            r.email || "",
+            r.datum || "",
+            r.uhrzeit || "",
+            r.id || ""
+          ].join(" ").toLowerCase();
+          return haystack.includes(search);
+        });
+      }
+
+      if (filtered.length === 0) {
+        resTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:1rem; font-size:0.9rem; color:#7a6a5c;">
+              Keine Reservierungen gefunden.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = "";
+      for (const r of filtered) {
+        const status = r.status || "neu";
+        const pillClass =
+          status === "bestaetigt"
+            ? "pill-bestaetigt"
+            : status === "abgelehnt"
+              ? "pill-abgelehnt"
+              : "pill-neu";
+
+        html += `
+          <tr>
+            <td>#${r.id || ""}</td>
+            <td>
+              ${r.name || "-"}<br>
+              <span class="small">${r.personen || "?"} Pers.</span>
+            </td>
+            <td>
+              ${r.email || "-"}
+            </td>
+            <td>
+              ${r.datum || "-"}<br>
+              <span class="small">${r.uhrzeit || ""}</span>
+            </td>
+            <td>
+              <span class="pill-status ${pillClass}">
+                ${status === "bestaetigt" ? "Bestätigt" :
+                   status === "abgelehnt" ? "Abgelehnt" : "Neu"}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <select data-id="${r.id || ""}" class="statusSelect">
+                <option value="neu" ${status === "neu" ? "selected" : ""}>Neu</option>
+                <option value="bestaetigt" ${status === "bestaetigt" ? "selected" : ""}>Bestätigt</option>
+                <option value="abgelehnt" ${status === "abgelehnt" ? "selected" : ""}>Abgelehnt</option>
+              </select>
+              <button type="button" class="secondary saveBtn" data-id="${r.id || ""}">
+                Speichern
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+
+      resTableBody.innerHTML = html;
+
+      // Event-Listener für alle Speichern-Buttons
+      document.querySelectorAll(".saveBtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          const select = document.querySelector(`select.statusSelect[data-id="${id}"]`);
+          if (!select) return;
+          const newStatus = select.value;
+          updateStatus(id, newStatus);
+        });
+      });
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        const res = await fetch(`${API_BASE}/admin-update`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-key": adminKey
+          },
+          body: JSON.stringify({ id, status })
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || "Fehler");
+        }
+
+        // lokal aktualisieren
+        reservations = reservations.map(r =>
+          r.id === id ? { ...r, status } : r
+        );
+        renderTable();
+        showStatus("Status aktualisiert & E-Mail gesendet.", true);
+      } catch (err) {
+        console.error(err);
+        showStatus("Fehler beim Aktualisieren des Status.", false);
+      }
+    }
+
+    // Login-Handling
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginError.textContent = "";
+      adminKey = document.getElementById("adminPassword").value.trim();
+
+      if (!adminKey) {
+        loginError.textContent = "Bitte Passwort eingeben.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin-list`, {
+          headers: {
+            "x-admin-key": adminKey
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error("Unauthorized");
+        }
+
+        const data = await res.json();
+        reservations = data.reservations || [];
+
+        loginView.style.display = "none";
+        appView.style.display = "block";
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = "Falsches Passwort oder Serverfehler.";
+      }
     });
-});
 
-// Suche
-document.getElementById("search").addEventListener("input", (e) => {
-  renderTable(e.target.value);
-});
+    searchInput.addEventListener("input", renderTable);
+    filterStatus.addEventListener("change", renderTable);
 
-// Refresh
-document.getElementById("refreshBtn").addEventListener("click", () => {
-  loadReservations();
-});
+    btnRefresh.addEventListener("click", () => {
+      fetchReservations();
+    });
 
-// Delegation für Buttons Bestätigen/Ablehnen
-document.getElementById("tableBody").addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-  const id = btn.getAttribute("data-id");
-  const status = btn.getAttribute("data-status");
-  if (id && status) {
-    updateStatus(id, status);
-  }
-});
-</script>
+    btnLogout.addEventListener("click", () => {
+      adminKey = "";
+      reservations = [];
+      resTableBody.innerHTML = "";
+      document.getElementById("adminPassword").value = "";
+      appView.style.display = "none";
+      loginView.style.display = "block";
+      statusBar.style.display = "none";
+    });
+  </script>
 </body>
 </html>
