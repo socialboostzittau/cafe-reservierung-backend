@@ -1,8 +1,8 @@
-mport nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import { kv } from "@vercel/kv";
 
 export default async function handler(req, res) {
-  // CORS für deine Neocities-Seite
+  // CORS erlauben
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://cafe-example-zittau.neocities.org"
@@ -33,13 +33,13 @@ export default async function handler(req, res) {
       },
     });
 
-    // 🔢 Eindeutige ID erzeugen
+    // ID erzeugen
     const id = await kv.incr("res:counter");
     const resId = String(id);
     const createdAt = new Date().toISOString();
 
-    // 💾 In KV speichern (Hash + Liste)
-    await kv.hset(res:${resId}, {
+    // In KV speichern
+    await kv.hset(`res:${resId}`, {
       id: resId,
       name,
       email,
@@ -52,11 +52,11 @@ export default async function handler(req, res) {
 
     await kv.lpush("res:list", resId);
 
-    // Mail an Café (dich)
+    // Mail an Café
     await transporter.sendMail({
       from: process.env.MAIL_USER,
       to: process.env.MAIL_USER,
-      subject: Neue Reservierung von ${name},
+      subject: `Neue Reservierung von ${name}`,
       text: `
 Neue Reservierung im Café Example Zittau:
 
@@ -70,9 +70,9 @@ Status: neu
       `,
     });
 
-    // Eingangsbestätigung an Gast
+    // Eingangsbestätigung an Kunde
     await transporter.sendMail({
-      from: "Café Example Zittau" <${process.env.MAIL_USER}>,
+      from: `"Café Example Zittau" <${process.env.MAIL_USER}>`,
       to: email,
       subject: "Deine Reservierungsanfrage im Café Example Zittau",
       text: `
@@ -103,6 +103,6 @@ Café Example Zittau
     console.error("MAIL / KV ERROR", err);
     return res
       .status(500)
-      .json({ message: "Fehler beim Senden der Reservierung." });
-  }
+      .json({ message: "Fehler beim Senden der Reservierung." });
+  }
 }
