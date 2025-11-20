@@ -1,7 +1,9 @@
 {
   "name": "cafe-reservierung-backend",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
-    "nodemailer": "^6.9.8"
+    "nodemailer": "6.9.8",
+    "@vercel/kv": "0.2.0"
   }
 }
