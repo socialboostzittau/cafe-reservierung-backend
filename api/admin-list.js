@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const reservations = [];
 
     for (const id of ids) {
-      const data = await kv.hgetall(res:${id});
+      const data = await kv.hgetall(`res:${id}`);   // ← FIXED
       if (data && data.id) {
         reservations.push(data);
       }
@@ -25,6 +25,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ reservations });
   } catch (err) {
     console.error("ADMIN LIST ERROR", err);
-    return res.status(500).json({ message: "Fehler beim Laden der Reservierungen." });
-  }
+    return res.status(500).json({ message: "Fehler beim Laden der Reservierungen." });
+  }
 }
